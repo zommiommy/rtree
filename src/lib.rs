@@ -54,7 +54,7 @@ impl<Element> RadixTree<Element> {
             *ptr = self.buckets.len() + 1;
             self.buckets.push(vec![element]);
         } else {
-            self.buckets[*ptr + 1].push(element);
+            self.buckets[*ptr - 1].push(element);
         }
     }
 
