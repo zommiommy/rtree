@@ -36,10 +36,10 @@ impl<Element> RadixTree<Element> {
         let ptr = &mut self.tables[table_idx][hash as usize];
         // check if the bucket exists, or create it
         if *ptr == 0 {
-            *ptr = self.buckets.len();
+            *ptr = self.buckets.len() + 1;
             self.buckets.push(vec![element]);
         } else {
-            self.buckets[*ptr].push(element);
+            self.buckets[*ptr + 1].push(element);
         }
     }
     
@@ -61,7 +61,7 @@ impl<Element> RadixTree<Element> {
         if *ptr == 0 {
             None
         } else {
-            Some(&self.buckets[*ptr])
+            Some(&self.buckets[*ptr - 1])
         }
     }
 
@@ -79,7 +79,7 @@ impl<Element> RadixTree<Element> {
                     continue;
                 }
                 if (i as u8 & mask as u8) == hash as u8 {
-                    result.push(&self.buckets[*ptr]);
+                    result.push(&self.buckets[*ptr - 1]);
                 }
             }
         }
