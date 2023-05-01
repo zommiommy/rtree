@@ -12,9 +12,19 @@ impl<Element> RadixTree<Element> {
             buckets: Vec::new(),
         }
     }
-    
+
+    /// Returns the number of elements in the tree.
+    pub fn len(&self) -> usize {
+        self.buckets.iter().map(|bucket| bucket.len()).sum()
+    }
+
+    /// Returns whether the three is currently empty.
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     /// Inserts the provided element in the proper bucket using the provided hash characterizing the element.
-    /// 
+    ///
     /// # Arguments
     /// * `element`: Element - The element to insert in the tree.
     /// * `hash`: u64 - The hash characterizing the element in the tree.
@@ -42,7 +52,7 @@ impl<Element> RadixTree<Element> {
             self.buckets[*ptr + 1].push(element);
         }
     }
-    
+
     pub fn get(&self, mut hash: u64) -> Option<&[Element]> {
         let mut table = &self.tables[0];
         for _ in 0..7 {
