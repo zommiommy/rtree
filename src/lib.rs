@@ -1,19 +1,24 @@
-
 #[derive(Debug, Clone)]
-pub struct RadixTree {
-    tables: Vec<[usize ;256]>,
-    buckets: Vec<Vec<u32>>,
+pub struct RadixTree<Element> {
+    tables: Vec<[usize; 256]>,
+    buckets: Vec<Vec<Element>>,
 }
 
-impl RadixTree {
+impl<Element> RadixTree<Element> {
+    /// Return new Radix Tree.
     pub fn new() -> Self {
         Self {
             tables: vec![[0; 256]],
-            buckets: vec![],
+            buckets: Vec::new(),
         }
     }
-
-    pub fn insert(&mut self, node_id: u32, mut hash: u64) {
+    
+    /// Inserts the provided element in the proper bucket using the provided hash characterizing the element.
+    /// 
+    /// # Arguments
+    /// * `element`: Element - The element to insert in the tree.
+    /// * `hash`: u64 - The hash characterizing the element in the tree.
+    pub fn insert(&mut self, element: Element, mut hash: u64) {
         let mut table_idx = 0;
         for _ in 0..7 {
             let idx = hash & 0xff;
@@ -32,13 +37,13 @@ impl RadixTree {
         // check if the bucket exists, or create it
         if *ptr == 0 {
             *ptr = self.buckets.len();
-            self.buckets.push(vec![node_id]);
+            self.buckets.push(vec![element]);
         } else {
-            self.buckets[*ptr].push(node_id);
+            self.buckets[*ptr].push(element);
         }
     }
-
-    pub fn get(&self, mut hash: u64) -> Option<&[u32]> {
+    
+    pub fn get(&self, mut hash: u64) -> Option<&[Element]> {
         let mut table = &self.tables[0];
         for _ in 0..7 {
             let idx = hash & 0xff;
@@ -49,7 +54,7 @@ impl RadixTree {
                 return None;
             }
             // table reference
-             table = &self.tables[*ptr as usize];
+            table = &self.tables[*ptr as usize];
         }
         let ptr = &table[hash as usize];
         // check if the bucket exists, or create it
@@ -60,7 +65,14 @@ impl RadixTree {
         }
     }
 
-    fn get_masked_inner<'a>(&'a self, hash: u64, mask: u64, depth: usize, table: &[usize; 256], mut result: Vec<&'a [u32]>) -> Vec<&'a [u32]>{
+    fn get_masked_inner<'a>(
+        &'a self,
+        hash: u64,
+        mask: u64,
+        depth: usize,
+        table: &[usize; 256],
+        mut result: Vec<&'a [Element]>,
+    ) -> Vec<&'a [Element]> {
         if depth == 7 {
             for (i, ptr) in table.iter().enumerate() {
                 if *ptr == 0 {
@@ -89,8 +101,8 @@ impl RadixTree {
         result
     }
 
-    pub fn get_masked(&self, mut hash: u64, mask: u64) -> Vec<&[u32]> {
+    pub fn get_masked(&self, mut hash: u64, mask: u64) -> Vec<&[Element]> {
         hash &= !mask; // ensure that the given hash is already masked :)
-        self.get_masked_inner(hash, mask, 0, &self.tables[0],  vec![])
+        self.get_masked_inner(hash, mask, 0, &self.tables[0], vec![])
     }
 }
