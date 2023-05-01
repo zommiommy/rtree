@@ -1,5 +1,5 @@
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RadixTree {
     tables: Vec<[usize ;256]>,
     buckets: Vec<Vec<u32>>,
