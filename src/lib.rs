@@ -23,6 +23,11 @@ impl<Element> RadixTree<Element> {
         self.len() == 0
     }
 
+    /// Iterates on all elements in the tree.
+    pub fn iter(&self) -> impl Iterator<Item = &Element> + '_ {
+        self.buckets.iter().flat_map(|bucket| bucket.iter())
+    }
+
     /// Inserts the provided element in the proper bucket using the provided hash characterizing the element.
     ///
     /// # Arguments
