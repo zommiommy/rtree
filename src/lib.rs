@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 pub struct RadixTree<Element> {
-    tables: Vec<[usize; 256]>,
-    buckets: Vec<Vec<Element>>,
+    pub tables: Vec<[usize; 256]>,
+    pub buckets: Vec<Vec<Element>>,
 }
 
 impl<Element> RadixTree<Element> {
@@ -93,10 +93,11 @@ impl<Element> RadixTree<Element> {
                 if *ptr == 0 {
                     continue;
                 }
-                if (i as u8 & mask as u8) == hash as u8 {
+                if ((i as u8 & !mask as u8) ^ hash as u8) == 0 {
                     result.push(&self.buckets[*ptr - 1]);
                 }
             }
+            return result;
         }
 
         let hash_byte = hash & 0xff;
@@ -106,8 +107,8 @@ impl<Element> RadixTree<Element> {
         for (i, ptr) in table.iter().enumerate() {
             if *ptr == 0 {
                 continue;
-            }
-            if (i as u8 & mask as u8) == hash_byte as u8 {
+            }   
+            if ((i as u8 & !mask as u8) ^ hash_byte as u8) == 0 {
                 let sub_table = &self.tables[*ptr];
                 result = self.get_masked_inner(sub_hash, sub_mask, depth + 1, sub_table, result);
             }
